@@ -79,3 +79,12 @@ ggplot(topttenprof, aes(x=year, y=total, group=profession, colour=profession))+g
 
 ```
 
+```{r}
+professions%>%filter(year=="2012")%>%arrange(desc(total)
+                                             
+                                             
+                                             
+                                             )%>%slice(1:10
+                                                                  )
+```
+
