@@ -1,0 +1,81 @@
+---
+title: "Untitled"
+author: "Jamaal Roach"
+date: "3/24/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,  warning=FALSE, message=FALSE)
+```
+
+
+```{r libraries}
+library(tidyverse)
+library(extrafont)
+library(ggthemes)
+library(hrbrthemes)
+library(CGPfunctions)
+```
+
+
+
+```{r load data}
+#get file location
+location<-getwd() 
+
+#generate list of data file names
+data_files<-list.files(location, pattern = "*.csv*")
+
+#read all data files and store in list of dataframes
+professions_2011_2015<-lapply(data_files, read.csv)
+
+#name data frames in list using full data file names.
+names(professions_2011_2015) <- gsub(".csv","",list.files(pattern = "*.csv",full.names = FALSE),fixed = TRUE)
+
+#combine listed data frames into one data frame
+professions<-do.call("rbind", professions_2011_2015)
+
+#Add year variable based on original datafile name.
+# 1 - create rowname variable
+professions<-rownames_to_column(professions)
+#2 -creat year variable by extracting numbers from rowname
+professions$rowname<-gsub("([0-9]+).*$", "\\1",professions$rowname)
+#3- create year varaible from year in rowname variable 
+professions$rowname<-parse_number(professions$rowname)
+names(professions)<-c("year","profession", "total")
+
+#convert all profession variable to lower case
+professions$profession<-tolower(professions$profession)
+
+
+```
+
+```{r top 10 and botom 10 professions in 2011}
+
+professions%>%filter(year=="2011")%>%arrange(desc(total)
+                                             
+                                             
+                                             
+                                             )%>%slice(1:10
+                                                                  )
+```
+
+
+
+```{r slopegraph}
+#convert year to factor
+
+professions$year<-as.factor(professions$year)
+
+topttenprof<-professions%>%filter(profession=="attorney-at-law"|profession=="architect"|profession=="emergency medical techniciah"|profession=="accountant"|profession=="dental practitioner"|profession=="medical laboratory technician"|profession=="engineer"|profession=="draughtsman"|profession=="medical practitioner"|profession=="real estate agent")
+
+#create slopegraph
+newggslopegraph(topttenprof, year,total, profession)
+```
+
+```{r}
+ggplot(topttenprof, aes(x=year, y=total, group=profession, colour=profession))+geom_line(size=1)+geom_point(data=topttenprof, aes(x=year, y=total))+geom_text(data = topttenprof%>%filter(year==2011), aes(x=year, y=total, label=profession), vjust=-.5, hjust=1, size=3)+geom_text(data = topttenprof%>%filter(year==2015), aes(x=year, y=total, label=profession), vjust=-.5, hjust=-.1, size=3)+theme_void()+theme(legend.position = "none")
+
+```
+
